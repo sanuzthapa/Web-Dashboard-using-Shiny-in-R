@@ -65,8 +65,8 @@ Boxplots are dynamically updated when the wage filter slider is adjusted, offeri
 
 <div style="display: flex; justify-content: center; gap: 10px;">
 
-<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i3boxplot.png" alt="Dynamic Boxplot 1" width="45%">
-<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i4boxplot.png" alt="Dynamic Boxplot 2" width="45%">
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i3boxplot.png" alt="Dynamic Boxplot 1" width="45%">
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i4boxplot.png" alt="Dynamic Boxplot 2" width="45%">
 
 </div>
 
@@ -78,8 +78,8 @@ Add or remove variables for regression analysis dynamically. The results update 
 
 <div style="display: flex; justify-content: center; gap: 10px;">
 
-<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i5regressionallcheck.png" alt="Regression Model with All Variables" width="45%">
-<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i5regressionHalfcheck.png" alt="Regression Model with Partial Variables" width="45%">
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i5regressionallcheck.png" alt="Regression Model with All Variables" width="45%">
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i5regressionHalfcheck.png" alt="Regression Model with Partial Variables" width="45%">
 
 </div>
 
@@ -92,7 +92,7 @@ Two models are built and compared dynamically:
 1. **Model 1**: `lm(Wage ~ Female + Age, data = eec)`  
 2. **Model 2**: `lm(Wage ~ Female + Age + Study_nodiploma + Study_brevet + Study_capbep + Study_bac + Study_superieur, data = eec)`  
 
-![Model Comparison](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i6modelComparison.png)
+![Model Comparison](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i6modelComparison.png)
 
 ---
 
@@ -100,7 +100,7 @@ Two models are built and compared dynamically:
 
 Histogram of residuals helps identify whether they follow a normal distribution.  
 
-![Residuals Histogram](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i6residual.png)
+![Residuals Histogram](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i6residual.png)
 
 ---
 
@@ -108,7 +108,7 @@ Histogram of residuals helps identify whether they follow a normal distribution.
 
 Visualize the correlation between various variables dynamically.  
 
-![Correlation Plot](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i7Correlation.png)
+![Correlation Plot](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/i7Correlation.png)
 
 ---
 
