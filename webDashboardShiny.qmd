@@ -1,0 +1,170 @@
+```{r}
+library(shiny)
+library(tidyverse)
+library(DT)
+library(corrplot)
+
+# Define UI for the application
+ui <- fluidPage(
+  
+  # Application title
+  titlePanel("Wage Analysis with Shiny ©  Sanuz THAPA"),
+  
+  # Sidebar layout with input and output definitions
+  sidebarLayout(
+    sidebarPanel(
+      fileInput("file1", "Choose CSV File", accept = ".csv"),
+      sliderInput("wage_limit", "Wage Filter (up to €6000):", min = 0, max = 6000, value = 6000),
+      actionButton("load_data", "Load and Process Data"),
+      
+      # Dropdown for selecting education levels
+      selectInput("edu_filter", "Filter by Education Level:", 
+                  choices = c("All", "No Diploma", "Brevet", "CAP/BEP", "Baccalauréat", "Higher Education"),
+                  selected = "All"),
+      
+      # Select variables for dynamic regression model
+      checkboxGroupInput("regression_vars", "Select Variables for Regression Model:", 
+                         choices = c("Female" = "Female", "Age" = "Age", 
+                                     "Study_nodiploma" = "Study_nodiploma", 
+                                     "Study_brevet" = "Study_brevet", 
+                                     "Study_capbep" = "Study_capbep", 
+                                     "Study_bac" = "Study_bac", 
+                                     "Study_superieur" = "Study_superieur"),
+                         selected = c("Female", "Age")),
+      
+      downloadButton("download_data", "Download Processed Data")
+    ),
+    
+    # Main panel to display the outputs
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Data Summary", tableOutput("data_summary")),
+        tabPanel("Boxplot", plotOutput("boxplot")),
+        tabPanel("Regression Results", verbatimTextOutput("regression_summary")),
+        tabPanel("Model Comparison", plotOutput("model_comparison")),
+        tabPanel("Residuals Histogram", plotOutput("residual_histogram")),
+        tabPanel("Correlation Plot", plotOutput("correlation_plot"))
+      )
+    )
+  )
+)
+
+# Define server logic for the application
+server <- function(input, output, session) {
+  
+  # Reactive expression to load and process data when the button is clicked
+  processed_data <- reactive({
+    req(input$file1)
+    eec <- read.csv2(input$file1$datapath, header = TRUE, sep = ";")
+    
+    # Data cleaning and processing
+    eec <- eec %>%
+      rename(Active = ACTEU,
+             Age = AGE,
+             Diploma = DDIPL,
+             Wage = SALMEE,
+             Gender = SEXE,
+             Worktime = TPP) %>%
+      filter(Active == 1 & Wage > 300 & Wage < 15000 & Worktime != 3) %>%
+      select(!NOI & !IDENT) %>%
+      na.omit() %>%
+      mutate(Female = as.numeric(Gender == 2), 
+             Study_nodiploma = as.numeric(Diploma == 7), 
+             Study_brevet = as.numeric(Diploma == 6),
+             Study_capbep = as.numeric(Diploma == 5), 
+             Study_bac = as.numeric(Diploma == 4),
+             Study_superieur = as.numeric(Diploma < 4))
+    
+    return(eec)
+  })
+  
+  # Generate summary of the data
+  output$data_summary <- renderTable({
+    eec <- processed_data()
+    summary(eec)
+  })
+  
+  # Create the boxplot (Wages below the selected limit)
+  output$boxplot <- renderPlot({
+    eec <- processed_data()
+    eec_filtered <- eec %>% filter(Wage <= input$wage_limit)
+    
+    ggplot(eec_filtered, aes(x = factor(Female), y = Wage, fill = factor(Female))) +
+      geom_boxplot() +
+      scale_x_discrete(labels = c("Men", "Women")) +
+      labs(title = paste("Distribution of Monthly Wages Below €", input$wage_limit, " by Gender"),
+           x = "Gender", y = "Monthly Wage (€)") +
+      theme_minimal() +
+      scale_fill_manual(values = c("lightblue", "pink"))
+  })
+  
+  # Perform the regressions and display the results
+  output$regression_summary <- renderPrint({
+    eec <- processed_data()
+    
+    # Select the variables based on user input
+    formula <- as.formula(paste("Wage ~", paste(input$regression_vars, collapse = " + ")))
+    
+    model <- lm(formula, data = eec)
+    summary(model)
+  })
+  
+  # Compare the two models and plot the comparison
+  output$model_comparison <- renderPlot({
+    eec <- processed_data()
+    
+    model <- lm(Wage ~ Female + Age, data = eec)
+    model2 <- lm(Wage ~ Female + Age + Study_nodiploma + Study_brevet + Study_capbep + Study_bac + Study_superieur, data = eec)
+    
+    eec$pred_model1 <- predict(model, newdata = eec)
+    eec$pred_model2 <- predict(model2, newdata = eec)
+    
+    ggplot(eec) +
+      geom_point(aes(x = Age, y = Wage, color = "Actual Wage"), alpha = 0.5) +
+      geom_line(aes(x = Age, y = pred_model1, color = "Model 1 (Gender + Age)"), size = 1) +
+      geom_line(aes(x = Age, y = pred_model2, color = "Model 2 (Gender + Age + Education)"), size = 1) +
+      labs(title = "Comparison of Actual Wages and Predicted Wages from Both Models",
+           x = "Age", y = "Monthly Wage (€)", color = "Legend") +
+      scale_color_manual(values = c("blue", "red", "green")) +
+      theme_minimal()
+  })
+  
+  # Plot the residual histogram of the second model
+  output$residual_histogram <- renderPlot({
+    eec <- processed_data()
+    
+    model2 <- lm(Wage ~ Female + Age + Study_nodiploma + Study_brevet + Study_capbep + Study_bac + Study_superieur, data = eec)
+    eec$residuals_model2 <- residuals(model2)
+    
+    ggplot(eec, aes(x = residuals_model2)) +
+      geom_histogram(bins = 30, fill = "lightblue", color = "black", alpha = 0.7) +
+      labs(title = "Histogram of Residuals from Model 2 (Wage ~ Gender + Age + Education)",
+           x = "Residuals", y = "Frequency") +
+      theme_minimal()
+  })
+  
+  # Plot the correlation matrix between variables
+  output$correlation_plot <- renderPlot({
+    eec <- processed_data()
+    
+    # Select numeric columns to calculate correlations
+    numeric_columns <- eec %>% select(Wage, Age, Female, Study_nodiploma, Study_brevet, Study_capbep, Study_bac, Study_superieur)
+    corr_matrix <- cor(numeric_columns)
+    
+    # Plot the correlation matrix using corrplot
+    corrplot(corr_matrix, method = "circle", type = "upper", tl.cex = 0.8)
+  })
+  
+  # Allow users to download the processed data
+  output$download_data <- downloadHandler(
+    filename = function() { paste("processed_data.csv") },
+    content = function(file) {
+      write.csv(processed_data(), file, row.names = FALSE)
+    }
+  )
+}
+
+# Run the application
+shinyApp(ui = ui, server = server)
+
+```
