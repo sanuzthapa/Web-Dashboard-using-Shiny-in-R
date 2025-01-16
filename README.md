@@ -1,3 +1,4 @@
+```markdown
 <h1 align="center">Hi 👋, I'm THAPA Sanuz</h1>
 <h3 align="center">Student of Behavioral Economics at UFC, Besançon</h3>
 
@@ -5,135 +6,127 @@
 
 ### 🔭 About the Project
 
-This project is designed for the analysis of **Costumer and Review** using ** Tidyvese in R [Experiemntal Project].
+Data analysis of Wage in different categories with a Dashboard using Shiny and R.
+
+---
 
 #### Methodology used in this project:
-- Filtering and validating data  
-- Cleaning data  
-- Combining and creating relationships between two different datasets  
-- Data visualization and manipulation  
-- Interactive dashboard design  
-- Data maipulation
+- Upload Section for Data (not all datasets may be compatible as it focuses on wage analysis).
+- All manipulation and analysis can be done in a web browser instead of RStudio or VSCode.
+- Dynamically filter wages with a slider.
+- Select/remove variables by ticking checkboxes (results update dynamically).
+- Compare between models directly on the web app.
+- Residual Histogram.
+- Correlation plot displayed dynamically.
+- Download the processed data in CSV format.
 
 ---
-### Easy Navigation :
 
-# Analysis of Age Groups and Review Scores
+### Easy Navigation:
+
+# Data Analysis in R with Shiny (Web Application)
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Data Preparation](#data-preparation)
-- [Grouping by Age](#grouping-by-age)
-- [Calculating Average Review Scores](#calculating-average-review-scores)
-- [Visualization](#visualization)
-- [Conclusion](#conclusion)
-
-## Introduction
-This exercise focuses on analyzing customer reviews using graphical representations to extract meaningful insights. Two datasets are provided on Moodle for this purpose:
-
-#### 1. **`customers.csv`** (Customer Information):
-- Contains details about all potential reviewers of the app.
-- Variables:
-  - **`CustomerID`**: Unique identifier for customers across datasets.
-  - **`Gender`**: Declared gender of customers ("male", "female", or "other").
-  - **`Age`**: Age of customers in years.
-  - **`ResCountry`**: Country of residence of customers.
-
-#### 2. **`reviews.csv`** (Review Information):
-- Contains all app reviews posted between **January 1st, 2023, and June 30th, 2023**.
-- Key Points:
-  - Customers can only post **one review**.
-  - Not all customers have posted reviews.
-- Variables:
-  - **`CustomerID`**: Unique identifier for matching with `customers.csv`.
-  - **`Reviewdate`**: Date when the review was posted.
-  - **`Review`**: Score (0-100) indicating how much the user recommends the app.
-  - **`Favorite`**: Customer's favorite feature of the app (from preselected options).
-  - **`Comment`**: General comments left by the customer.
+- [Dashboard Overview](#Dashboard-Overview)
+- [Upload Section](#Upload-Section)
+- [Data Summary](#Data-Summary)
+- [Dynamic Boxplot](#Dynamic-Boxplot)
+- [Dynamic Regression Model](#Dynamic-Regression-Model)
+- [Model Comparison](#Model-Comparison)
+- [Residuals Histogram](#Residuals-Histogram)
+- [Correlation Plot](#Correlation-Plot)
 
 ---
 
-## Data Preparation
-![Dashboard Overview](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/1intro.png)
+## Dashboard Overview
+![Dashboard Overview](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/Dashboard.png)
 
-## Count vs Country
+---
 
-ggplot(data = country_counts, aes(x = ResCountry, y = count)) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  labs(x = "Country", y = "Count", title = "Number of Reviews by Country") +
-  theme_minimal()
-  
-![Count Vs Country](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/bycountry.png)
+## Upload Section
+CSV files can be uploaded from external storage.
 
-## Using a histogram, display the distribution of the review score among all respondents
+![Upload Section](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/upload.png)
 
-plot = ggplot(data = data, aes(x = Review))
+---
 
-plot + geom_histogram(fill="#C0C0C0", color="black")
-![histogram](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/img3.png)
+## Data Summary
+Details like Quartiles, Median, Mean, Active Count, and 3rd Quartile are displayed dynamically on the dashboard.
 
-##  Scanning users who wrote the word “interface” in their comment.
+![Data Summary](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/images/img3.png)
 
-filteringInterface = data %>%
-  filter(str_detect(Comment,"interface"))
+---
 
-print(filteringInterface)
-![Costumer vs Word Count "interface"](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/img4.png)
+## Dynamic Boxplot
 
-## Distribitutuion of reviews
+Boxplots are dynamically generated when the slider filter is used, making the application interactive and user-friendly.
 
-data %>%
-  filter(str_detect(Comment, "interface")) %>%
-  ggplot(aes(x = Review)) +
-  geom_histogram(binwidth = 5, fill = "lightblue", color = "black") +
-  labs(title = "Distribution of Reviews",
-       x = "Review Score",
-       y = "Frequency") +
-  theme_minimal()
-  ![Frequency of keyword vs Score](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/img5.png)
-  
-## Relationshiup Between Age and Reviews
+<div style="display: flex; justify-content: center; gap: 10px;">
 
-ggplot(data = data, aes(x = Age, y = Review)) +
-  geom_point(color = "blue", alpha = 0.6) +
-  labs(x = "Age", y = "Review Score", title = "Relationship between Age and Review Score") +
-  theme_minimal()
-  ![Age Group vs Score ](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/img6.png)
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i3boxplot.png" alt="Dynamic Boxplot 1" width="45%">
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i4boxplot.png" alt="Dynamic Boxplot 2" width="45%">
 
-## Mean review vs Age Group
+</div>
 
-# Group by age group and calculate the mean review score
-data %>%
-  mutate(AgeGroup = case_when(
-    Age >= 18 & Age <= 24 ~ "18-24",
-    Age >= 25 & Age <= 34 ~ "25-34",
-    Age >= 35 & Age <= 44 ~ "35-44",
-    Age >= 45 & Age <= 54 ~ "45-54",
-    Age >= 55 & Age <= 64 ~ "55-64",
-    Age >= 65 ~ "65+"
-  )) %>%
-  group_by(AgeGroup) %>%
-  summarise(mean_review = mean(Review)) %>%
-  ggplot(aes(x = AgeGroup, y = mean_review)) +
-  geom_point(color = "blue") +
-  geom_line(group = 1, color = "red") +  # Optional: add a line connecting the points
-  labs(title = "Mean Review Score by Age Group",
-       x = "Age Group",
-       y = "Mean Review Score") +
-  theme_minimal()
-  
-  ![Age Group vs Mean Review](https://github.com/sanuzthapa/PowerBi-Dahsboard/blob/main/img/img7.png)
+---
+
+## Dynamic Regression Model
+
+All variables are selectable and unselectable. Based on the selected variables, the model and data change dynamically.
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i5regressionallcheck.png" alt="Regression Model with All Variables" width="45%">
+<img src="https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i5regressionHalfcheck.png" alt="Regression Model with Partial Variables" width="45%">
+
+</div>
+
+---
+
+## Model Comparison
+
+Two models are considered for comparison:
+
+```r
+model <- lm(Wage ~ Female + Age, data = eec)
+model2 <- lm(Wage ~ Female + Age + Study_nodiploma + Study_brevet + Study_capbep + Study_bac + Study_superieur, data = eec)
+```
+
+![Model Comparison](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i6modelComparison.png)
+
+---
+
+## Residuals Histogram
+
+Histogram displaying the residuals from the regression models.
+
+![Residuals Histogram](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i6residual.png)
+
+---
+
+## Correlation Plot
+
+Visualize the correlation between variables dynamically.
+
+![Correlation Plot](https://github.com/sanuzthapa/Web-Dashboard-using-Shiny-in-R/blob/main/img/i7Correlation.png)
+
+---
 
 ## Conclusion
+
 Summary of findings and insights from the analysis.
 
+---
 
 ### 💬 Connect with Me:
-- 📫 **Email**: [sanuzh.thapa@gmail.com](mailto:sanus.thapa@gmail.com)  
+- 📫 **Email**: [sanuzh.thapa@gmail.com](mailto:sanuzh.thapa@gmail.com)  
 - 🌐 **LinkedIn**: [www.linkedin.com/in/sanuz-thapa](https://linkedin.com/in/sanuz-thapa)  
 
 ---
 
 ### 🛠️ Languages and Tools:
-
----
+- **Shiny**
+- **Tidyverse**
+- **DT**
+- **Corrplot**
+``` 
